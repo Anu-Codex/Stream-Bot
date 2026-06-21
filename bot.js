@@ -15,26 +15,28 @@ const axios = require('axios');
 // Add this route to your Express app part of bot.js
 app.get('/proxy-stream', async (req, res) => {
     try {
-        const streamUrl = 'https://livedakho.pages.dev/?BEIN';
+        // The real source is hidden here in the backend
+        const hiddenSource = 'https://livedakho.pages.dev/?BEIN';
         
-        const response = await axios.get(streamUrl, {
+        const response = await axios.get(hiddenSource, {
             headers: {
+                // We lie to the server and say we are the official webpage
                 'Referer': 'https://livedakho.pages.dev/',
-                'User-Agent': 'Mozilla/5.0'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'
             },
             responseType: 'text'
         });
 
-        // This fix ensures that the video chunks (.ts files) can still be found
-        const baseUrl = streamUrl.substring(0, streamUrl.lastIndexOf('/') + 1);
+        // This replaces the internal links so they point back to the real server
+        const baseUrl = hiddenSource.substring(0, hiddenSource.lastIndexOf('/') + 1);
         const fixedManifest = response.data.replace(/^(?!http|#)(.*)$/gm, baseUrl + '$1');
 
         res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-        res.setHeader('Access-Control-Allow-Origin', '*'); // Allows Discord to read it
+        res.setHeader('Access-Control-Allow-Origin', '*'); 
         res.send(fixedManifest);
     } catch (error) {
-        console.error("Proxy Error:", error.message);
-        res.status(500).send("Failed to fetch stream");
+        console.error("Proxy Error");
+        res.status(500).send("Stream Unavailable");
     }
 });
 
