@@ -24,13 +24,24 @@ const commands = [
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
+// Replace your existing registration block with this:
 (async () => {
     try {
         console.log('Started refreshing application (/) commands.');
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('Successfully reloaded application (/) commands.');
+
+        // Use Guild Commands for testing (Replace GUILD_ID with your Server ID)
+        // This usually avoids the "Entry Point" error during setup
+        const GUILD_ID = '1518205016887001128'; 
+
+        await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, GUILD_ID),
+            { body: commands },
+        );
+
+        console.log('Successfully reloaded commands for the server.');
     } catch (error) {
-        console.error(error);
+        console.error("Command Refresh Error:", error);
+        console.log("Tip: If you see Error 50240, it means Discord is protecting your 'Activity Entry Point'. The bot will likely still work!");
     }
 })();
 
