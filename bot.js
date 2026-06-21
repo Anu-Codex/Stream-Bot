@@ -15,12 +15,12 @@ const axios = require('axios');
 // Add this route to your Express app part of bot.js
 app.get('/proxy-stream', async (req, res) => {
     try {
-        const streamUrl = 'https://b4.taazaboom.com/p/b4xsports.html?b4x=https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8&m=1';
+        const streamUrl = 'https://livedakho.pages.dev/?BEIN';
         
         const response = await axios.get(streamUrl, {
             headers: {
-                'Referer': 'https://b4.taazaboom.com/',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'Referer': 'https://livedakho.pages.dev/',
+                'User-Agent': 'Mozilla/5.0'
             },
             responseType: 'text'
         });
