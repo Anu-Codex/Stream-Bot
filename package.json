@@ -1,13 +1,15 @@
 {
-  "name": "discord-video-activity",
+  "name": "discord-video-bot",
   "version": "1.0.0",
+  "description": "Discord Activity Bot with Video Proxy",
   "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
+    "axios": "^1.6.2",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2"
-  },
-  "scripts": {
-    "start": "node bot.js"
   }
 }
