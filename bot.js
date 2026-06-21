@@ -10,6 +10,34 @@ app.listen(port, () => {
   console.log(`Health check server listening on port ${port}`);
 });
 
+const axios = require('axios');
+
+// Add this route to your Express app part of bot.js
+app.get('/proxy-stream', async (req, res) => {
+    try {
+        const streamUrl = 'https://b4.taazaboom.com/p/b4xsports.html?b4x=https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8&m=1';
+        
+        const response = await axios.get(streamUrl, {
+            headers: {
+                'Referer': 'https://b4.taazaboom.com/',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            responseType: 'text'
+        });
+
+        // This fix ensures that the video chunks (.ts files) can still be found
+        const baseUrl = streamUrl.substring(0, streamUrl.lastIndexOf('/') + 1);
+        const fixedManifest = response.data.replace(/^(?!http|#)(.*)$/gm, baseUrl + '$1');
+
+        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+        res.setHeader('Access-Control-Allow-Origin', '*'); // Allows Discord to read it
+        res.send(fixedManifest);
+    } catch (error) {
+        console.error("Proxy Error:", error.message);
+        res.status(500).send("Failed to fetch stream");
+    }
+});
+
 // ... rest of your existing bot code below ...
 require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
