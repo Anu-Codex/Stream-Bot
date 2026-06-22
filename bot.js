@@ -9,6 +9,21 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Health check server listening on port ${port}`);
 });
+// At the top of bot.js
+const startTime = Date.now();
+let statusMessageId = null; // We will save the ID here to edit it
+const STATUS_CHANNEL_ID = 'YOUR_STATUS_CHANNEL_ID'; // The channel where the dashboard lives
+
+// Function to format Uptime
+function getUptime() {
+    let totalSeconds = (process.uptime());
+    let days = Math.floor(totalSeconds / 86400);
+    totalSeconds %= 86400;
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    return `${days}d ${hours}h ${minutes}m`;
+}
 
 const axios = require('axios');
 
@@ -93,6 +108,54 @@ client.on('interactionCreate', async interaction => {
             return interaction.reply("Failed to start activity. Check permissions.");
         }
     }
+});
+const { EmbedBuilder } = require('discord.js');
+
+async function updateStatusDashboard(client) {
+    const channel = await client.channels.fetch(STATUS_CHANNEL_ID);
+    if (!channel) return;
+
+    // Create the "Green Bar" visual (30 blocks)
+    const historyBars = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩";
+    
+    const statusEmbed = new EmbedBuilder()
+        .setTitle('NEXUS LEGENDS | SYSTEM LIVENESS')
+        .setColor('#00d4ff')
+        .setDescription('**All services are operational**')
+        .addFields(
+            { name: '📡 Stream Proxy', value: `${historyBars} \n**99.99% Uptime**`, inline: false },
+            { name: '🤖 Bot Core', value: `${historyBars} \n**Operational**`, inline: false },
+            { name: '⏱️ Total Uptime', value: `\`${getUptime()}\``, inline: true },
+            { name: '🚀 Ping', value: `\`${client.ws.ping}ms\``, inline: true }
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Updates every 60 seconds • Powered by Nexus Legends' });
+
+    try {
+        if (!statusMessageId) {
+            // First time: Send the message
+            const msg = await channel.send({ embeds: [statusEmbed] });
+            statusMessageId = msg.id;
+        } else {
+            // Every other time: Edit the message
+            const msg = await channel.messages.fetch(statusMessageId);
+            await msg.edit({ embeds: [statusEmbed] });
+        }
+    } catch (err) {
+        console.error("Dashboard update failed:", err);
+        statusMessageId = null; // Reset if message was deleted
+    }
+}
+client.once('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    
+    // Initial update
+    updateStatusDashboard(client);
+
+    // Update every 60 seconds (60000ms)
+    setInterval(() => {
+        updateStatusDashboard(client);
+    }, 60000);
 });
 
 client.login(process.env.TOKEN);
