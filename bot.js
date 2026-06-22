@@ -12,7 +12,7 @@ app.listen(port, () => {
 // At the top of bot.js
 const startTime = Date.now();
 let statusMessageId = null; // We will save the ID here to edit it
-const STATUS_CHANNEL_ID = 'YOUR_STATUS_CHANNEL_ID'; // The channel where the dashboard lives
+const STATUS_CHANNEL_ID = '1518492063807569952'; // The channel where the dashboard lives
 
 // Function to format Uptime
 function getUptime() {
