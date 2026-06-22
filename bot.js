@@ -147,6 +147,7 @@ async function updateStatusDashboard(client) {
     }
 }
 client.once('ready', () => {
+    client.user.setActivity('eFootball Live', { type: ActivityType.Streaming, url: 'https://twitch.tv/nexus_legends' });
     console.log(`Logged in as ${client.user.tag}!`);
     
     // Initial update
